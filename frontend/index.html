@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S.</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%2300f0ff%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <canvas id="webgl-canvas"></canvas>
+
+    <header>
+        <div class="logo">J.A.R.V.I.S.</div>
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="jarvis" type="button">Jarvis</button>
+            <button class="mode-btn" data-mode="general" type="button">General</button>
+            <button class="mode-btn" data-mode="realtime" type="button">Realtime</button>
+        </div>
+        <button class="action-btn" id="open-settings" type="button">Settings</button>
+    </header>
+
+    <div class="app-layout">
+        <div class="side-panel left-panel" id="left-panel">
+            <div class="panel-header">
+                <span>Recent Activity</span>
+                <button class="action-btn" id="new-chat-btn" type="button" style="padding: 4px 10px; font-size: 0.8rem;">+
+                    New</button>
+            </div>
+            <div class="panel-content" id="activity-content">
+                <div style="color: var(--text-secondary); font-size: 0.9rem; text-align: center; margin-top: 20px;">
+                    Loading sessions...</div>
+            </div>
+        </div>
+
+        <div class="resizer" id="resizer-left"></div>
+
+        <div class="center-area">
+            <div id="chat-container">
+                <div class="message ai-msg">Systems online. Activity panels and web processors engaged. How can I help
+                    you today, Sir?</div>
+            </div>
+
+            <div class="input-container">
+                <input type="file" id="file-input" accept="image/*" style="display:none" />
+                <button id="attach-btn" class="btn-icon" type="button" title="Attach image">
+                    <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                </button>
+                <button id="camera-btn" class="btn-icon" type="button" title="Camera">
+                    <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                </button>
+                <span id="attach-preview" class="attach-preview" style="display:none;"></span>
+                <button id="tts-toggle" class="btn-icon"
+                    style="border-color: var(--accent); background: var(--accent-glow);" type="button" title="Toggle Text-to-Speech">
+                    <svg style="fill: var(--accent);" viewBox="0 0 24 24">
+                        <path
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                </button>
+                <button id="mic-btn" class="btn-icon" type="button" title="Voice Input">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
+                    </svg>
+                </button>
+                <textarea id="user-input" placeholder="Message Jarvis..." rows="1"></textarea>
+                <button id="send-btn" class="btn-icon"
+                    style="border-color: var(--accent); background: var(--accent-glow);" type="button" title="Send">
+                    <svg style="fill: var(--accent);" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="resizer" id="resizer-right"></div>
+
+        <div class="side-panel right-panel" id="right-panel">
+            <div class="panel-header">Live Web Searches</div>
+            <div class="panel-content" id="search-content">
+                <div style="color: var(--text-secondary); font-size: 0.9rem; text-align: center; margin-top: 20px;">
+                    Waiting for Realtime queries...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h2>Preferences</h2>
+            <div class="setting-row">
+                <span>Show Activity Panel (Left)</span>
+                <label class="switch"><input type="checkbox" id="toggle-left" checked><span
+                        class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span>Show Live Searches (Right)</span>
+                <label class="switch"><input type="checkbox" id="toggle-right" checked><span
+                        class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span>"Thinking" Audio Effect</span>
+                <label class="switch"><input type="checkbox" id="toggle-thinking" checked><span
+                        class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span>Voice (Neural)</span>
+                <select id="voice-select" class="voice-select">
+                    <option value="en-GB-RyanNeural">UK Male (Ryan)</option>
+                </select>
+            </div>
+            <button class="modal-close" id="close-settings" type="button">Save & Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="camera-modal">
+        <div class="modal">
+            <h2>Camera</h2>
+            <video id="camera-video" playsinline autoplay muted></video>
+            <div class="camera-actions">
+                <button class="action-btn" id="camera-close" type="button">Cancel</button>
+                <button class="action-btn" id="camera-capture" type="button">Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <script src="/static/orb.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
